@@ -4,6 +4,6 @@
 
 ### Requirements
 
-- python3.13.5
+- python3.10
 - make
 - pip

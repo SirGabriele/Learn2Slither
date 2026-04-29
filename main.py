@@ -1,42 +1,16 @@
 import pygame
 
-from board import Board
-from constants import BOARD_SIZE_IN_CELL, BOARD_BG_COL, WINDOW_NAME
-from pygame import Event, Surface
-
-from sources.sprites.SpriteManager import SpriteManager
-from sources.sprites.SpritesConfig import SpriteName
+from constants import GL_BOARD_SIZE_IN_CELL, GL_BOARD_BG_COLOUR, \
+    GL_SNAKE_COLOUR, GL_WINDOW_NAME
+from pygame import Clock, Event, Surface
+from sources.board import Board
+from sources.direction_enum import Direction
+from sources.handle_movement import handle_movement
 from sources.utils.get_window_size import get_window_size
 
 
-# FIXME temporary method. To delete
-def draw_grid(surface: Surface, board: Board):
-    left: int = board.l_border
-    top: int = board.t_border
-    step: int = board.cell_length_px
-    size_in_cell: int = board.size_in_cell
-
-    # Vertical lines
-    for i in range(size_in_cell + 1):
-        x = left + i * step
-        pygame.draw.line(
-            surface,
-            'white',
-            (x, top),
-            (x, top + size_in_cell * step),
-            1
-        )
-
-    # Horizontal lines
-    for j in range(size_in_cell + 1):
-        y = top + j * step
-        pygame.draw.line(
-            surface,
-            'white',
-            (left, y),
-            (left + size_in_cell * step, y),
-            1
-        )
+def draw_grid(surface: Surface, grid: Surface, pos: tuple[int, int]):
+    surface.blit(grid, pos)
 
 
 def should_quit_game(event: Event):
@@ -50,43 +24,53 @@ def should_quit_game(event: Event):
 def main():
     pygame.init()
 
-    (win_w, win_h), cell_length_px = get_window_size(BOARD_SIZE_IN_CELL)
+    (win_w, win_h), cell_length_px = get_window_size(GL_BOARD_SIZE_IN_CELL)
 
     surface: Surface = pygame.display.set_mode((win_w, win_h))
-    pygame.display.set_caption(WINDOW_NAME)
+    pygame.display.set_caption(GL_WINDOW_NAME)
 
-    sm: SpriteManager = SpriteManager(cell_length_px)
-    # FIXME issue with odd nb_cells
     board: Board = Board(win_w, win_h, cell_length_px)
 
-    pos_x = win_w / 2
-    pos_y = win_h / 2
-    clock = pygame.time.Clock()
-    running: bool = True
+    clock: Clock = pygame.time.Clock()
+    quit_game: bool = False
 
-    while running:
+    # Associate each keyboard movement key with its matching Direction
+    MOVE_MAP = {
+        pygame.K_w: Direction.UP,
+        pygame.K_s: Direction.DOWN,
+        pygame.K_a: Direction.LEFT,
+        pygame.K_d: Direction.RIGHT
+    }
+
+    while not quit_game and not board.snake.is_dead():
         for event in pygame.event.get():
             if should_quit_game(event):
-                running = False
-
-            surface.fill(BOARD_BG_COL)
-            draw_grid(surface, board)
+                quit_game = True
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    pos_y -= board.cell_length_px
-                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    pos_y += board.cell_length_px
-                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    pos_x -= board.cell_length_px
-                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    pos_x += board.cell_length_px
+                if event.key in MOVE_MAP:
+                    handle_movement(board, MOVE_MAP[event.key])
 
-        surface.blit(sm.get(SpriteName.SNAKE_HEAD_UP), (pos_x, pos_y))
+                    if board.snake.is_dead():
+                        continue
 
-        # TODO provide sequence of rectangle to update?
+        surface.fill(GL_BOARD_BG_COLOUR)
+
+        # Draw snake
+        for segment in board.snake.segments:
+            pygame.draw.rect(surface, GL_SNAKE_COLOUR, segment)
+
+        # Draw apples
+        for apple in board.apples:
+            pygame.draw.rect(surface, apple.colour.value, apple.rect)
+
+        # Draw grid at the end to have it on the foreground
+        # draw_grid(surface, board)
+        draw_grid(surface, board.get_grid(), (board.rect.left, board.rect.top))
+
         pygame.display.update()
 
+        # TODO remove this tick for training
         clock.tick(60)
 
     pygame.quit()

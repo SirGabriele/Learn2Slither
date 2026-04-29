@@ -1,15 +1,14 @@
 # Colours
-BOARD_BG_COL: tuple[int, int, int] = (30, 30, 30)
-
-# Paths
-PATH_SPRITE_SHEET: str = "resources/assets/spritesheet.png"
+# BOARD_BG_COL: tuple[int, int, int] = (30, 30, 30)
+GL_BOARD_BG_COLOUR: str = "dimgray"
+GL_GREEN_APPLE_COLOUR: str = "green"
+GL_RED_APPLE_COLOUR: str = "red"
+GL_SNAKE_COLOUR: str = "lightblue"
+CL_GRID_COLOUR: str = "white"
 
 # Sizes
-SPRITE_NAT_LENGTH: int = 64
-BOARD_SIZE_IN_CELL: int = 11
-SPRITE_NAT_RESOLUTION: tuple[int, int] = (
-    SPRITE_NAT_LENGTH, SPRITE_NAT_LENGTH
-)
+# 5 <= GL_BOARD_SIZE_IN_CELL <= 30
+GL_BOARD_SIZE_IN_CELL: int = 10
 
 # Window
-WINDOW_NAME: str = "Learn2Slither"
+GL_WINDOW_NAME: str = "Learn2Slither"
