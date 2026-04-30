@@ -40,7 +40,7 @@ class Snake:
         dx, dy = self.deltas[direction]
         return self.get_head().move(dx, dy)
 
-    def move(self, next_snake_pos: Rect, eaten_apple: Apple | None) -> None:
+    def move(self, next_snake_head: Rect, eaten_apple: Apple | None) -> None:
         """Each turn the snake obtains a new segment at its new head position
         and loses an element at its tail position, visually simulating its
         progress. Segment wise, this behaviour does +1 -1, which does not
@@ -54,7 +54,7 @@ class Snake:
         one. Segment wise, does +1 -1 -1, which decreases the total length of
         the snake by one unit.
         """
-        new_head: Rect = next_snake_pos
+        new_head: Rect = next_snake_head
         self.segments.append(new_head)
 
         # Green apple prevents the snake from its default shrinkage
@@ -79,6 +79,9 @@ class Snake:
 
     def get_body_without_head(self) -> list[Rect]:
         return self.segments[:-1]
+
+    def get_neck(self) -> Rect:
+        return self.segments[-2]
 
     def _remove_tail(self) -> None:
         self.segments.pop(0)
