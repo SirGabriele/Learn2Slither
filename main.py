@@ -13,6 +13,10 @@ def draw_grid(surface: Surface, grid: Surface, pos: tuple[int, int]):
     surface.blit(grid, pos)
 
 
+def is_game_win_or_lost(board: Board) -> bool:
+    return board.is_win() or board.snake.is_dead()
+
+
 def should_quit_game(event: Event):
     if event.type == pygame.QUIT:
         return True
@@ -42,17 +46,16 @@ def main():
         pygame.K_d: Direction.RIGHT
     }
 
-    while not quit_game and not board.snake.is_dead():
+    while not quit_game and not is_game_win_or_lost(board):
         for event in pygame.event.get():
             if should_quit_game(event):
                 quit_game = True
 
-            if event.type == pygame.KEYDOWN:
-                if event.key in MOVE_MAP:
-                    handle_movement(board, MOVE_MAP[event.key])
+            if event.type == pygame.KEYDOWN and event.key in MOVE_MAP:
+                handle_movement(board, MOVE_MAP[event.key])
 
-                    if board.snake.is_dead():
-                        continue
+        if is_game_win_or_lost(board):
+            continue
 
         surface.fill(GL_BOARD_BG_COLOUR)
 

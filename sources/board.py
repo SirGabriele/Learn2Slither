@@ -25,6 +25,7 @@ class Board:
 
         self.half_size_in_px: int = board_half_size_in_px
         self.size_in_cell: int = GL_BOARD_SIZE_IN_CELL
+        self.total_amount_of_cells = self.size_in_cell * self.size_in_cell
         self.cell_length_px: int = cell_length_px
         self.rect: Rect = pygame.Rect(
             l_border, t_border, board_size_in_px, board_size_in_px
@@ -37,18 +38,28 @@ class Board:
                                   self.cell_length_px)
 
         self.apples: list[Apple] = []
-        self.apples.append(self.generate_apple(AppleColour.GREEN))
-        self.apples.append(self.generate_apple(AppleColour.GREEN))
-        self.apples.append(self.generate_apple(AppleColour.RED))
+        if (apple := self.generate_apple(AppleColour.GREEN)) is not None:
+            self.apples.append(apple)
+        if (apple := self.generate_apple(AppleColour.GREEN)) is not None:
+            self.apples.append(apple)
+        if (apple := self.generate_apple(AppleColour.RED)) is not None:
+            self.apples.append(apple)
 
         self._grid: Surface = self._create_grid_surface()
+        self._game_win: bool = False
 
-    def generate_apple(self, colour: AppleColour) -> Apple:
-        # TODO gérer le cas où plus aucune cell n'est libre
+    def generate_apple(self, colour: AppleColour) -> Apple | None:
+        # Creates a set containing all cells on which an obstacle is, including
+        # snake segments and apples
         occupied_cells: set[tuple[int, int]] = (
                 {(seg.x, seg.y) for seg in self.snake.segments} |
                 {(apple.rect.x, apple.rect.y) for apple in self.apples}
         )
+        # Adds + 1 because the apple that is currently being generated has not
+        # been pushed in the apple list yet
+        if len(occupied_cells) + 1 == self.total_amount_of_cells:
+            self.win()
+            return None
 
         while True:
             col: int = randrange(GL_BOARD_SIZE_IN_CELL)
@@ -71,7 +82,8 @@ class Board:
         self.apples.remove(apple)
 
         # Creates a new apple of the same colour
-        self.apples.append(self.generate_apple(apple.colour))
+        if (apple := self.generate_apple(apple.colour)) is not None:
+            self.apples.append(apple)
 
     def _create_grid_surface(self) -> Surface:
         grid_length_px: int = self.size_in_cell * self.cell_length_px
@@ -92,3 +104,9 @@ class Board:
 
     def get_grid(self) -> Surface:
         return self._grid
+
+    def is_win(self) -> bool:
+        return self._game_win
+
+    def win(self) -> None:
+        self._game_win = True

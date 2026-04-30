@@ -1,5 +1,4 @@
 # Colours
-# BOARD_BG_COL: tuple[int, int, int] = (30, 30, 30)
 GL_BOARD_BG_COLOUR: str = "dimgray"
 GL_GREEN_APPLE_COLOUR: str = "green"
 GL_RED_APPLE_COLOUR: str = "red"

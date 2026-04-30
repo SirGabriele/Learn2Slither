@@ -55,7 +55,6 @@ class Snake:
 
         # Green apple prevents the snake from its default shrinkage
         if eaten_apple and eaten_apple.colour == AppleColour.GREEN:
-            # TODO gérer le cas où le serpent fait la taille max
             return
 
         # Red apple leads to one extra tail loss
