@@ -2,7 +2,8 @@
 GL_BOARD_BG_COLOUR: str = "dimgray"
 GL_GREEN_APPLE_COLOUR: str = "green"
 GL_RED_APPLE_COLOUR: str = "red"
-GL_SNAKE_COLOUR: str = "lightblue"
+GL_SNAKE_HEAD_COLOUR: str = "cornflowerblue"
+GL_SNAKE_BODY_COLOUR: str = "lightblue"
 CL_GRID_COLOUR: str = "white"
 
 # Sizes

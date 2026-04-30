@@ -1,7 +1,7 @@
 import pygame
 
 from constants import GL_BOARD_SIZE_IN_CELL, GL_BOARD_BG_COLOUR, \
-    GL_SNAKE_COLOUR, GL_WINDOW_NAME
+    GL_SNAKE_BODY_COLOUR, GL_SNAKE_HEAD_COLOUR, GL_WINDOW_NAME
 from pygame import Clock, Event, Surface
 from sources.board import Board
 from sources.direction_enum import Direction
@@ -60,8 +60,9 @@ def main():
         surface.fill(GL_BOARD_BG_COLOUR)
 
         # Draw snake
-        for segment in board.snake.segments:
-            pygame.draw.rect(surface, GL_SNAKE_COLOUR, segment)
+        pygame.draw.rect(surface, GL_SNAKE_HEAD_COLOUR, board.snake.get_head())
+        for segment in board.snake.get_body_without_head():
+            pygame.draw.rect(surface, GL_SNAKE_BODY_COLOUR, segment)
 
         # Draw apples
         for apple in board.apples:

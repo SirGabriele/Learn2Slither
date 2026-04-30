@@ -69,6 +69,9 @@ class Snake:
     def get_tail(self) -> Rect:
         return self.segments[0]
 
+    def get_body_without_head(self) -> list[Rect]:
+        return self.segments[:-1]
+
     def _remove_tail(self) -> None:
         self.segments.pop(0)
 
