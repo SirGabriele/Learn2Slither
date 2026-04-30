@@ -1,5 +1,8 @@
-from pygame import Rect
+import pygame
 
+from pygame import Rect, Surface
+from constants import GL_SNAKE_EYE_COLOUR, GL_SNAKE_HEAD_COLOUR, \
+    GL_SNAKE_PUPIL_COLOUR
 from sources.apple import Apple
 from sources.apple_color import AppleColour
 from sources.direction_enum import Direction
@@ -29,10 +32,11 @@ class Snake:
             Direction.DOWN: (0, self.cell_length_px),
         }
         self._is_dead: bool = False
+        self._head_surface: Surface = self._create_head_surface()
 
     def sim_next_move(self, direction: Direction) -> Rect:
-        """Simulates the movement of the snake and returns the position in
-        which the snake would then be"""
+        """Simulates the movement of the snake and returns the Rect object
+        the head of the snake would use"""
         dx, dy = self.deltas[direction]
         return self.get_head().move(dx, dy)
 
@@ -66,6 +70,10 @@ class Snake:
     def get_head(self) -> Rect:
         return self.segments[-1]
 
+    def get_head_pos(self) -> tuple[int, int]:
+        head = self.get_head()
+        return head.x, head.y
+
     def get_tail(self) -> Rect:
         return self.segments[0]
 
@@ -84,3 +92,37 @@ class Snake:
 
     def die(self) -> None:
         self._is_dead = True
+
+    def get_head_surface(self) -> Surface:
+        return self._head_surface
+
+    def _create_head_surface(self) -> Surface:
+        # Creates the surface and the rectangle to draw on
+        surface = Surface((self.cell_length_px, self.cell_length_px))
+        rect = (0, 0, self.cell_length_px, self.cell_length_px)
+
+        # Draws the rectangle (background) within the surface
+        pygame.draw.rect(surface, GL_SNAKE_HEAD_COLOUR, rect)
+
+        # Uses the length of the cell to define circles position and sizes
+        eye_radius = self.cell_length_px // 4
+        eye_offset = self.cell_length_px // 4
+        pupil_radius = eye_radius // 2
+
+        # Draws left eye within the surface
+        pygame.draw.circle(surface, GL_SNAKE_EYE_COLOUR,
+                           (eye_offset, eye_offset),
+                           eye_radius)
+        pygame.draw.circle(surface, GL_SNAKE_PUPIL_COLOUR,
+                           (eye_offset, eye_offset),
+                           pupil_radius)
+
+        # Draws right eye within the surface
+        pygame.draw.circle(surface, GL_SNAKE_EYE_COLOUR,
+                           (self.cell_length_px - eye_offset, eye_offset),
+                           eye_radius)
+        pygame.draw.circle(surface, GL_SNAKE_PUPIL_COLOUR,
+                           (self.cell_length_px - eye_offset, eye_offset),
+                           pupil_radius)
+
+        return surface
