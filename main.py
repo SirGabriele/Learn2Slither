@@ -9,6 +9,8 @@ from sources.direction_enum import Direction
 from sources.handle_movement import handle_movement
 from sources.snake import Snake
 from sources.utils.get_window_size import get_window_size
+from sources.utils.has_body import has_body
+from sources.utils.has_tail import has_tail
 
 
 def draw_grid(surface: Surface, grid: Surface, pos: tuple[int, int]):
@@ -25,9 +27,13 @@ def draw_tail(surface: Surface, tail: Rect):
 
 def draw_snake(surface: Surface, snake: Snake):
     draw_head(surface, snake.get_head_surface(), snake.get_head_pos())
-    for segment in snake.get_body_without_head():
-        pygame.draw.rect(surface, GL_SNAKE_BODY_COLOUR, segment)
-    draw_tail(surface, snake.get_tail())
+
+    if has_body(snake):
+        for segment in snake.get_body():
+            pygame.draw.rect(surface, GL_SNAKE_BODY_COLOUR, segment)
+
+    if has_tail(snake):
+        draw_tail(surface, snake.get_tail())
 
 
 def draw_game(surface: Surface, board: Board):

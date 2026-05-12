@@ -77,8 +77,9 @@ class Snake:
     def get_tail(self) -> Rect:
         return self.segments[0]
 
-    def get_body_without_head(self) -> list[Rect]:
-        return self.segments[:-1]
+    def get_body(self) -> list[Rect]:
+        """Returns the body without head and without tail"""
+        return self.segments[1:-1]
 
     def get_neck(self) -> Rect:
         return self.segments[-2]
