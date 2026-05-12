@@ -4,7 +4,7 @@ from pygame import Rect, Surface
 from constants import GL_SNAKE_EYE_COLOUR, GL_SNAKE_HEAD_COLOUR, \
     GL_SNAKE_PUPIL_COLOUR
 from sources.apple import Apple
-from sources.apple_color import AppleColour
+from sources.apple_colour import AppleColour
 from sources.direction_enum import Direction
 
 

@@ -1,5 +1,5 @@
 from pygame import Rect
-from sources.apple_color import AppleColour
+from sources.apple_colour import AppleColour
 
 
 class Apple:

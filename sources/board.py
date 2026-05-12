@@ -5,7 +5,7 @@ from random import randrange
 from constants import CL_GRID_COLOUR, GL_BOARD_SIZE_IN_CELL
 from sources.snake import Snake
 from sources.apple import Apple
-from sources.apple_color import AppleColour
+from sources.apple_colour import AppleColour
 
 
 class Board:
