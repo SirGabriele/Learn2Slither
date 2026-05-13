@@ -56,6 +56,9 @@ def main():
         if is_game_win_or_lost(board):
             continue
 
+        snake_vision = scan_snake_vision(board)
+        print_snake_vision(snake_vision)
+
         draw_game(surface, board)
 
         pygame.display.update()

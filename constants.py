@@ -15,3 +15,13 @@ GL_BOARD_SIZE_IN_CELL: int = 10
 
 # Window
 GL_WINDOW_NAME: str = "Learn2Slither"
+
+# Snake vision letters
+GL_VISION_WALL: str = 'W'
+GL_VISION_SNAKE_HEAD: str = 'H'
+GL_VISION_SNAKE_BODY: str = 'S'
+GL_VISION_SNAKE_TAIL: str = 'T'
+GL_VISION_FREE_CELL: str = '0'
+GL_VISION_EMPTY: str = ' '
+GL_VISION_GREEN_APPLE: str = 'G'
+GL_VISION_RED_APPLE: str = 'R'
