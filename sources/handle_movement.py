@@ -4,7 +4,7 @@ from sources.board import Board
 from sources.collision.is_snake_collision_self import is_snake_collision_self
 from sources.collision.is_snake_going_backward import is_snake_going_backward
 from sources.collision.is_snake_out_of_bound import is_snake_out_of_bound
-from sources.direction_enum import Direction
+from sources.enums.direction_enum import Direction
 from sources.get_eaten_apple import get_eaten_apple
 
 

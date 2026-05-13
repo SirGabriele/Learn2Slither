@@ -5,7 +5,7 @@ from random import randrange
 from constants import CL_GRID_COLOUR, GL_BOARD_SIZE_IN_CELL
 from sources.snake import Snake
 from sources.apple import Apple
-from sources.apple_colour import AppleColour
+from sources.enums.colour_enum import Colour
 
 
 class Board:
@@ -38,17 +38,17 @@ class Board:
                                   self.cell_length_px)
 
         self.apples: list[Apple] = []
-        if (apple := self.generate_apple(AppleColour.GREEN)) is not None:
+        if (apple := self.generate_apple(Colour.GREEN)) is not None:
             self.apples.append(apple)
-        if (apple := self.generate_apple(AppleColour.GREEN)) is not None:
+        if (apple := self.generate_apple(Colour.GREEN)) is not None:
             self.apples.append(apple)
-        if (apple := self.generate_apple(AppleColour.RED)) is not None:
+        if (apple := self.generate_apple(Colour.RED)) is not None:
             self.apples.append(apple)
 
         self._grid: Surface = self._create_grid_surface()
         self._game_win: bool = False
 
-    def generate_apple(self, colour: AppleColour) -> Apple | None:
+    def generate_apple(self, colour: Colour) -> Apple | None:
         # Creates a set containing all cells on which an obstacle is, including
         # snake segments and apples
         occupied_cells: set[tuple[int, int]] = (

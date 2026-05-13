@@ -4,8 +4,8 @@ from pygame import Rect, Surface
 from constants import GL_SNAKE_EYE_COLOUR, GL_SNAKE_HEAD_COLOUR, \
     GL_SNAKE_PUPIL_COLOUR
 from sources.apple import Apple
-from sources.apple_colour import AppleColour
-from sources.direction_enum import Direction
+from sources.enums.colour_enum import Colour
+from sources.enums.direction_enum import Direction
 
 
 class Snake:
@@ -58,11 +58,11 @@ class Snake:
         self.segments.append(new_head)
 
         # Green apple prevents the snake from its default shrinkage
-        if eaten_apple and eaten_apple.colour == AppleColour.GREEN:
+        if eaten_apple and eaten_apple.colour == Colour.GREEN:
             return
 
         # Red apple leads to one extra tail loss
-        if eaten_apple and eaten_apple.colour == AppleColour.RED:
+        if eaten_apple and eaten_apple.colour == Colour.RED:
             self._remove_tail()
 
         self._remove_tail()

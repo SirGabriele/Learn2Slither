@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class AppleColour(Enum):
+class Colour(Enum):
     GREEN = "green"
     RED = "red"

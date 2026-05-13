@@ -1,81 +1,42 @@
 import pygame
 
-from constants import GL_BOARD_SIZE_IN_CELL, GL_BOARD_BG_COLOUR, \
-    GL_SNAKE_BODY_COLOUR, GL_SNAKE_TAIL_COLOUR, GL_WINDOW_NAME
-from pygame import Clock, Event, Rect, Surface
+from constants import GL_BOARD_SIZE_IN_CELL, GL_WINDOW_NAME
+from pygame import Clock, Surface
 
 from sources.board import Board
-from sources.direction_enum import Direction
+from sources.enums.direction_enum import Direction
+from sources.draw_game import draw_game
 from sources.handle_movement import handle_movement
-from sources.snake import Snake
+from sources.scan_snake_vision import scan_snake_vision
 from sources.utils.get_window_size import get_window_size
-from sources.utils.has_body import has_body
-from sources.utils.has_tail import has_tail
-
-
-def draw_grid(surface: Surface, grid: Surface, pos: tuple[int, int]):
-    surface.blit(grid, pos)
-
-
-def draw_head(surface: Surface, head: Surface, pos: tuple[int, int]):
-    surface.blit(head, pos)
-
-
-def draw_tail(surface: Surface, tail: Rect):
-    pygame.draw.rect(surface, GL_SNAKE_TAIL_COLOUR, tail)
-
-
-def draw_snake(surface: Surface, snake: Snake):
-    draw_head(surface, snake.get_head_surface(), snake.get_head_pos())
-
-    if has_body(snake):
-        for segment in snake.get_body():
-            pygame.draw.rect(surface, GL_SNAKE_BODY_COLOUR, segment)
-
-    if has_tail(snake):
-        draw_tail(surface, snake.get_tail())
-
-
-def draw_game(surface: Surface, board: Board):
-    surface.fill(GL_BOARD_BG_COLOUR)
-
-    # Draw snake
-    draw_snake(surface, board.snake)
-
-    # Draw apples
-    for apple in board.apples:
-        pygame.draw.rect(surface, apple.colour.value, apple.rect)
-
-    # Draw grid at the end to keep it on the foreground
-    draw_grid(surface, board.get_grid(), (board.rect.left, board.rect.top))
-
-
-def is_game_win_or_lost(board: Board) -> bool:
-    return board.is_win() or board.snake.is_dead()
-
-
-def should_quit_game(event: Event):
-    if event.type == pygame.QUIT:
-        return True
-    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-        return True
-    return False
+from sources.utils.is_game_win_or_lost import is_game_win_or_lost
+from sources.utils.print_snake_vision import print_snake_vision
+from sources.utils.should_quit_game import should_quit_game
 
 
 def main():
     pygame.init()
 
+    # Gets the window's dimensions and corresponding pixel length of one cell
     (win_w, win_h), cell_length_px = get_window_size(GL_BOARD_SIZE_IN_CELL)
 
+    # Creates a Surface object from the window's dimensions
     surface: Surface = pygame.display.set_mode((win_w, win_h))
+
+    # Sets the window's name
     pygame.display.set_caption(GL_WINDOW_NAME)
 
+    # Initialises Board object
     board: Board = Board(win_w, win_h, cell_length_px)
 
+    # Creates a Clock object that is used to refresh the screen a limited
+    # amount of times per second
     clock: Clock = pygame.time.Clock()
+
+    # Boolean that represents if the game must be quited or not
     quit_game: bool = False
 
-    # Associate each keyboard movement key with its matching Direction
+    # Associates each keyboard movement key with its matching Direction
     MOVE_MAP = {
         pygame.K_w: Direction.UP,
         pygame.K_s: Direction.DOWN,
@@ -88,6 +49,7 @@ def main():
             if should_quit_game(event):
                 quit_game = True
 
+            # TODO décoreller mouvement des touches pour que l'IA puisse bouger
             if event.type == pygame.KEYDOWN and event.key in MOVE_MAP:
                 handle_movement(board, MOVE_MAP[event.key])
 

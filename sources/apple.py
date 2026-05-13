@@ -1,8 +1,8 @@
 from pygame import Rect
-from sources.apple_colour import AppleColour
+from sources.enums.colour_enum import Colour
 
 
 class Apple:
-    def __init__(self, rect: Rect, colour: AppleColour) -> None:
+    def __init__(self, rect: Rect, colour: Colour) -> None:
         self.rect: Rect = rect
-        self.colour: AppleColour = colour
+        self.colour: Colour = colour
