@@ -1,5 +1,5 @@
 from pygame import Rect
-from sources.snake import Snake
+from sources.classes.snake import Snake
 from sources.utils.has_tail import has_tail
 
 

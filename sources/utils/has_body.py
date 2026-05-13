@@ -1,4 +1,4 @@
-from sources.snake import Snake
+from sources.classes.snake import Snake
 
 
 def has_body(snake: Snake) -> bool:

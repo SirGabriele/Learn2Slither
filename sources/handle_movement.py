@@ -1,11 +1,11 @@
 from pygame import Rect
-from sources.apple import Apple
-from sources.board import Board
+from sources.classes.apple import Apple
+from sources.classes.board import Board
 from sources.collision.is_snake_collision_self import is_snake_collision_self
 from sources.collision.is_snake_going_backward import is_snake_going_backward
 from sources.collision.is_snake_out_of_bound import is_snake_out_of_bound
 from sources.enums.direction_enum import Direction
-from sources.get_eaten_apple import get_eaten_apple
+from sources.utils.get_eaten_apple import get_eaten_apple
 
 
 def handle_movement(board: Board, direction: Direction) -> None:

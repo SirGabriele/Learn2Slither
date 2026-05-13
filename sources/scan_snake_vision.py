@@ -6,7 +6,7 @@ from constants import GL_VISION_EMPTY, GL_VISION_FREE_CELL, \
     GL_VISION_SNAKE_BODY, \
     GL_VISION_SNAKE_HEAD, \
     GL_VISION_SNAKE_TAIL, GL_VISION_WALL
-from sources.board import Board
+from sources.classes.board import Board
 from sources.enums.colour_enum import Colour
 from sources.utils.has_body import has_body
 from sources.utils.has_tail import has_tail

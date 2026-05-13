@@ -3,7 +3,7 @@ import pygame
 from constants import GL_BOARD_SIZE_IN_CELL, GL_WINDOW_NAME
 from pygame import Clock, Surface
 
-from sources.board import Board
+from sources.classes.board import Board
 from sources.enums.direction_enum import Direction
 from sources.draw_game import draw_game
 from sources.handle_movement import handle_movement

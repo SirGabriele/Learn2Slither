@@ -3,9 +3,9 @@ import pygame
 from pygame import Rect, Surface
 from constants import GL_BOARD_BG_COLOUR, GL_SNAKE_BODY_COLOUR, \
     GL_SNAKE_TAIL_COLOUR
-from sources.apple import Apple
-from sources.board import Board
-from sources.snake import Snake
+from sources.classes.apple import Apple
+from sources.classes.board import Board
+from sources.classes.snake import Snake
 from sources.utils.has_body import has_body
 from sources.utils.has_tail import has_tail
 

@@ -3,8 +3,8 @@ import pygame
 from pygame import Rect, Surface
 from random import randrange
 from constants import CL_GRID_COLOUR, GL_BOARD_SIZE_IN_CELL
-from sources.snake import Snake
-from sources.apple import Apple
+from sources.classes.apple import Apple
+from sources.classes.snake import Snake
 from sources.enums.colour_enum import Colour
 
 
