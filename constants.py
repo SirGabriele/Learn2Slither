@@ -14,14 +14,14 @@ CL_GRID_COLOUR: str = "white"
 GL_BOARD_SIZE_IN_CELL: int = 10
 
 # Window
-GL_WINDOW_NAME: str = "Learn2Slither"
+GL_PROGRAM_NAME: str = "Learn2Slither"
 
-# Snake vision letters
-GL_VISION_WALL: str = 'W'
-GL_VISION_SNAKE_HEAD: str = 'H'
-GL_VISION_SNAKE_BODY: str = 'S'
-GL_VISION_SNAKE_TAIL: str = 'T'
-GL_VISION_FREE_CELL: str = '0'
-GL_VISION_EMPTY: str = ' '
-GL_VISION_GREEN_APPLE: str = 'G'
-GL_VISION_RED_APPLE: str = 'R'
+# Game state letters
+GL_GAME_STATE_WALL: str = 'W'
+GL_GAME_STATE_SNAKE_HEAD: str = 'H'
+GL_GAME_STATE_SNAKE_BODY: str = 'S'
+GL_GAME_STATE_SNAKE_TAIL: str = 'T'
+GL_GAME_STATE_FREE_CELL: str = '0'
+GL_GAME_STATE_EMPTY: str = ' '
+GL_GAME_STATE_GREEN_APPLE: str = 'G'
+GL_GAME_STATE_RED_APPLE: str = 'R'
