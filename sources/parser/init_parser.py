@@ -28,7 +28,6 @@ def assert_json_content_format_valid(path: Path) -> None:
     BINARY_KEY_EXPR = re.compile(r"^0{4}[01]{12}$")
 
     for key, value in data.items():
-        print(key)
         if not BINARY_KEY_EXPR.match(key):
             raise ArgumentTypeError(
                 f"Format Error: Key '{key}' is invalid. "

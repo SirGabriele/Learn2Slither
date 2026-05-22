@@ -60,7 +60,7 @@ def get_apple_layer(array: np.ndarray,
     array[row_idxs + 1, col_idxs + 1] = apple_symbol
 
 
-def get_game_state(board: Board) -> np.ndarray:
+def get_snake_vision(board: Board) -> np.ndarray:
     # Extracts the left and top pos of the board's rectangle
     left_offset, top_offset, _, _ = board.rect
 

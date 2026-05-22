@@ -18,9 +18,14 @@ def main():
 
     agent: Agent = Agent(save_file, load_file, learning_mode)
 
-    for session in range(args.session):
+    for session in range(sessions):
+        print(f"Running session {session + 1}/{sessions}")
         run_session(agent=agent, visual_mode=visual_mode,
                     step_by_step=step_by_step)
+    print()
+
+    if save_file:
+        agent.save(save_file)
 
 
 if __name__ == '__main__':
