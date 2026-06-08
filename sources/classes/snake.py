@@ -1,3 +1,5 @@
+from random import choice, randrange
+
 import pygame
 
 from pygame import Rect, Surface
@@ -10,26 +12,15 @@ from sources.enums.direction_enum import Direction
 
 class Snake:
     def __init__(self,
-                 spawn_x_pos: int,
-                 spawn_y_pos: int,
+                 segments: list[Rect],
                  cell_length_px: int) -> None:
         self.cell_length_px: int = cell_length_px
-        self.segments: list[Rect] = [
-            # Tail
-            Rect((spawn_x_pos - cell_length_px, spawn_y_pos),
-                 (cell_length_px, cell_length_px)),
-            # Body
-            Rect((spawn_x_pos, spawn_y_pos),
-                 (cell_length_px, cell_length_px)),
-            # Head
-            Rect((spawn_x_pos + cell_length_px, spawn_y_pos),
-                 (cell_length_px, cell_length_px))
-        ]
+        self.segments: list[Rect] = segments
         self.deltas: dict[Direction, tuple[int, int]] = {
-            Direction.LEFT: (-self.cell_length_px, 0),
+            Direction.LEFT : (-self.cell_length_px, 0),
             Direction.RIGHT: (self.cell_length_px, 0),
-            Direction.UP: (0, -self.cell_length_px),
-            Direction.DOWN: (0, self.cell_length_px),
+            Direction.UP   : (0, -self.cell_length_px),
+            Direction.DOWN : (0, self.cell_length_px),
         }
         self._is_dead: bool = False
         self._head_surface: Surface = self._create_head_surface()

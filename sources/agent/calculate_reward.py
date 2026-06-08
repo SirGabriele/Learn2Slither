@@ -7,7 +7,7 @@ from sources.enums.colour_enum import Colour
 
 
 def calculate_reward(is_dead: bool,
-                     eaten_apple: Apple | None) -> float:
+                     eaten_apple: Apple | None) -> int:
     if is_dead:
         return GL_REWARD_DEATH
 

@@ -99,7 +99,7 @@ def add_arg_load(parser: ArgumentParser) -> None:
 
 def add_arg_save(parser: ArgumentParser) -> None:
     save_help_desc: str = ("file in which the resulting model will be "
-                           "saved (Path)")
+                           "saved (Path). Requires '-l on' / '--learning on'")
 
     parser.add_argument("--save", type=save_file_valid,
                         default=None, metavar="/path/to/save/file",

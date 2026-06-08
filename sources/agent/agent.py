@@ -1,15 +1,9 @@
 import json
 import random
-
 import numpy as np
 from pathlib import Path
 
-from bitmap import BitMap
-from numpy import ndarray
-
 from sources.enums.direction_enum import Direction
-from sources.utils.convert_game_state_to_bitmap import \
-    convert_game_state_to_bitmap
 
 
 class Agent:
@@ -22,11 +16,9 @@ class Agent:
         self.learning_mode: bool = learning_mode
         self.qtable: dict[str, list[float]] = {}
 
-        # Learning rate
-        self.alpha = 0.1
+        self.learning_rate = 0.1
 
-        # Discount factor
-        self.gamma = 0.9
+        self.discount_factor = 0.9
 
         # Exploration rate
         self.epsilon = 0.1
@@ -71,7 +63,7 @@ class Agent:
     def learn(self,
               old_game_state: str,
               new_game_state: str,
-              reward: float,
+              reward: int,
               action: Direction):
         old_q_values = self.get_q_values(old_game_state)
         new_q_values = self.get_q_values(new_game_state)
@@ -83,8 +75,8 @@ class Agent:
         max_future_q_values = np.max(new_q_values)
 
         # THE BELLMAN EQUATION
-        new_q = current_q_value + self.alpha * (
-                    reward + self.gamma * max_future_q_values - current_q_value)
+        new_q = current_q_value + self.learning_rate * (
+                reward + self.discount_factor * max_future_q_values - current_q_value)
 
         self.qtable[old_game_state][action_index] = new_q
 

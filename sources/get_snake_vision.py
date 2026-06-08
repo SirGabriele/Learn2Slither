@@ -30,6 +30,10 @@ def get_snake_layer(array: np.ndarray,
                     board: Board,
                     left_offset: int,
                     top_offset: int):
+    if len(board.snake.segments) == 0:
+        print("if len segment = 0 get_snake_layer")
+        return
+
     lefts = np.array([s.left for s in board.snake.segments])
     tops = np.array([s.top for s in board.snake.segments])
 
@@ -89,6 +93,9 @@ def get_snake_vision(board: Board) -> np.ndarray:
 
     # Finds the coordinates of the snake's head
     head_coords = np.where(board_array == GL_GAME_STATE_SNAKE_HEAD)
+    if head_coords[0].size == 0:
+        print("if head_coords[0].size == 0 get_snake_vision")
+        return np.full(board_shape, GL_GAME_STATE_EMPTY, dtype='<U1')
     head_row, head_col = head_coords[0][0], head_coords[1][0]
 
     # Creates a mask of True values

@@ -1,7 +1,7 @@
 import pygame
 
 from pygame import Rect, Surface
-from random import randrange
+from random import randrange, sample
 from constants import CL_GRID_COLOUR, GL_BOARD_SIZE_IN_CELL
 from sources.classes.apple import Apple
 from sources.classes.snake import Snake
@@ -32,10 +32,7 @@ class Board:
         )
 
         # Creates snake
-        spawn_x_pos: int = self.rect.left + self.half_size_in_px
-        spawn_y_pos: int = self.rect.top + self.half_size_in_px
-        self.snake: Snake = Snake(spawn_x_pos, spawn_y_pos,
-                                  self.cell_length_px)
+        self.snake: Snake = self._init_snake()
 
         self.apples: list[Apple] = []
         if (apple := self.generate_apple(Colour.GREEN)) is not None:
@@ -110,3 +107,41 @@ class Board:
 
     def win(self) -> None:
         self._game_win = True
+
+    def _init_snake(self) -> Snake:
+        # Selects a random cell on the grid that will correspond to the
+        # snake's body
+        body_col: int = randrange(self.size_in_cell)
+        body_row: int = randrange(self.size_in_cell)
+
+        # Maps out 4 adjacent cells
+        adjacent_cells: list[tuple[int, int]] = [
+            (body_col + 1, body_row),  # Right
+            (body_col - 1, body_row),  # Left
+            (body_col, body_row + 1),  # Down
+            (body_col, body_row - 1)   # Up
+        ]
+
+        # Filters out the out of bound cells
+        valid_adjacent_cells: list[tuple[int, int]] = [
+            (c, r) for c, r in adjacent_cells
+            if 0 <= c < self.size_in_cell and 0 <= r < self.size_in_cell
+        ]
+
+        tail_cell, head_cell = sample(valid_adjacent_cells, 2)
+
+        def to_rect(col: int, row: int) -> Rect:
+            return Rect(
+                self.rect.left + (col * self.cell_length_px),
+                self.rect.top + (row * self.cell_length_px),
+                self.cell_length_px,
+                self.cell_length_px
+            )
+
+        segments: list[Rect] = [
+            to_rect(*tail_cell),
+            to_rect(body_col, body_row),
+            to_rect(*head_cell)
+        ]
+
+        return Snake(segments, self.cell_length_px)
