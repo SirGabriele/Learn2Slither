@@ -25,22 +25,16 @@ from sources.utils.process_step_limit import process_step_limit
 from sources.utils.should_quit_game import should_quit_game
 
 
-def run_session(agent: Agent, visual_mode: bool, step_by_step: bool):
-    pygame.init()
-
-    surface: Surface | None = None
+def run_session(agent: Agent,
+                visual_mode: bool,
+                step_by_step: bool,
+                surface: Surface | None,
+                win_w: int,
+                win_h: int,
+                cell_length_px: int):
     clock: Clock | None = None
 
-    # Gets the window's dimensions and corresponding pixel length of one cell
-    (win_w, win_h), cell_length_px = get_window_size(GL_BOARD_SIZE_IN_CELL)
-
     if visual_mode:
-        # Sets the window's name
-        pygame.display.set_caption(GL_PROGRAM_NAME)
-
-        # Creates a Surface object from the window's dimensions
-        surface = pygame.display.set_mode((win_w, win_h))
-
         # Creates a Clock object that is used to refresh the screen a limited
         # amount of times per second
         clock = Clock()
@@ -50,7 +44,6 @@ def run_session(agent: Agent, visual_mode: bool, step_by_step: bool):
 
     # Boolean that represents if the game must be quited or not
     quit_game: bool = False
-    # Boolean that represents if the game is waiting for an input
 
     # Prints the initial snake vision
     game_state = get_snake_vision(board)
@@ -75,14 +68,14 @@ def run_session(agent: Agent, visual_mode: bool, step_by_step: bool):
 
                 if is_step_validated(pygame_event):
                     run_game = True
-            else:
-                # TODO ça va ça?
-                step_validation = input(
-                    "Press Enter to advance step (or type 'q' to quit)...")
-                if step_validation.strip().lower() == 'q':
-                    quit_game = True
-                    continue
-                run_game = True
+            # else:
+            #     # TODO ça va ça?
+            #     step_validation = input(
+            #         "Press Enter to advance step (or type 'q' to quit)...")
+            #     if step_validation.strip().lower() == 'q':
+            #         quit_game = True
+            #         continue
+            #     run_game = True
         else:
             for pygame_event in pygame.event.get():
                 if should_quit_game(pygame_event):
@@ -114,10 +107,10 @@ def run_session(agent: Agent, visual_mode: bool, step_by_step: bool):
             print_snake_vision(snake_vision, action)
 
         if visual_mode and surface is not None and clock is not None:
+            # if visual_mode and surface is not None:
             draw_game(surface, board)
             pygame.display.update()
             clock.tick(GL_FRAME_PER_SECOND)
 
     # Decreases epsilon so that the agent explores less and less overtime
     agent.lower_epsilon()
-    pygame.quit()

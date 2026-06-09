@@ -1,0 +1,6 @@
+- interdire sbs et visualisation off
+- remettre un mode jouable manuellement pour faire des tests précis (manger
+pommes rouges et tomber à 0 de length)
+- retourner longueur snake, log la moyennes et taille max
+- passer le jeu en ndarray? A voir, gros travail de refacto nécessaire mais
+utile pour tester de gros temps d'entrainement
