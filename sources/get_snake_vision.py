@@ -5,6 +5,7 @@ from constants import GL_GAME_STATE_EMPTY, GL_GAME_STATE_FREE_CELL, \
     GL_GAME_STATE_SNAKE_HEAD, GL_GAME_STATE_SNAKE_TAIL, GL_GAME_STATE_WALL
 from sources.classes.board import Board
 from sources.enums.colour_enum import Colour
+from sources.utils.fill_walls import fill_walls
 from sources.utils.has_body import has_body
 from sources.utils.has_tail import has_tail
 
@@ -15,27 +16,16 @@ def get_board_index(px_array: np.ndarray,
     return (px_array - offset) // cell_length_px
 
 
-def fill_wall(array: np.ndarray):
-    # Top row
-    array[0, :] = GL_GAME_STATE_WALL
-    # Bottom row
-    array[-1, :] = GL_GAME_STATE_WALL
-    # Left column
-    array[:, 0] = GL_GAME_STATE_WALL
-    # Right column
-    array[:, -1] = GL_GAME_STATE_WALL
-
-
 def get_snake_layer(array: np.ndarray,
                     board: Board,
                     left_offset: int,
                     top_offset: int):
-    if len(board.snake.segments) == 0:
+    if len(board.snake._segments) == 0:
         print("if len segment = 0 get_snake_layer")
         return
 
-    lefts = np.array([s.left for s in board.snake.segments])
-    tops = np.array([s.top for s in board.snake.segments])
+    lefts = np.array([s.left for s in board.snake._segments])
+    tops = np.array([s.top for s in board.snake._segments])
 
     col_idxs = get_board_index(lefts, left_offset, board.cell_length_px)
     row_idxs = get_board_index(tops, top_offset, board.cell_length_px)
@@ -76,7 +66,7 @@ def get_snake_vision(board: Board) -> np.ndarray:
     board_array = np.full(board_shape, GL_GAME_STATE_FREE_CELL, dtype='<U1')
 
     # Fills the array with wall symbols
-    fill_wall(board_array)
+    fill_walls(board_array)
 
     # Fills the array with snake symbols
     get_snake_layer(board_array, board, left_offset, top_offset)

@@ -12,7 +12,7 @@ def handle_movement(board: Board, direction: Direction) -> Apple | None:
     next_snake_head: Rect = snake.sim_next_move(direction)
 
     if is_snake_out_of_bound(board.rect, next_snake_head) or \
-            is_snake_collision_self(next_snake_head, snake.segments):
+            is_snake_collision_self(next_snake_head, snake._segments):
         snake.die()
         return None
 

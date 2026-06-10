@@ -11,7 +11,7 @@ CL_GRID_COLOUR: str = "white"
 
 # Sizes
 # 5 <= GL_BOARD_SIZE_IN_CELL <= 30
-GL_BOARD_SIZE_IN_CELL: int = 10
+GL_BOARD_SIZE_IN_CELL: int = 5
 
 # Window
 GL_PROGRAM_NAME: str = "Learn2Slither"
@@ -21,6 +21,7 @@ GL_GAME_STATE_WALL: str = 'W'
 GL_GAME_STATE_SNAKE_HEAD: str = 'H'
 GL_GAME_STATE_SNAKE_BODY: str = 'S'
 GL_GAME_STATE_SNAKE_TAIL: str = 'T'
+# TODO essayer de remplacer par espace vide
 GL_GAME_STATE_FREE_CELL: str = '0'
 GL_GAME_STATE_EMPTY: str = ' '
 GL_GAME_STATE_GREEN_APPLE: str = 'G'

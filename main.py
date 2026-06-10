@@ -24,12 +24,12 @@ def main():
 
     if args.learning == "off" and args.save is not None:
         parser.error(
-            "Arguments conflict: Cannot use '--save' when learning is 'off'.")
+            "Arguments conflict: Can not use '--save' when learning is 'off'.")
 
-    if args.visual == "on" and args.step_by_step:
+    if args.visual == "off" and args.step_by_step:
         parser.error(
-            "Arguments conflict: Cannot use 'step by step mode' when visual "
-            "mode is 'on'.")
+            "Arguments conflict: Can not use 'step by step mode' when visual "
+            "mode is 'off'.")
 
     sessions: int = args.session
     visual_mode: bool = args.visual == "on"

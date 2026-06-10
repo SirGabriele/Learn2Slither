@@ -46,38 +46,41 @@ def run_session(agent: Agent,
     quit_game: bool = False
 
     # Prints the initial snake vision
-    game_state = get_snake_vision(board)
-    print_snake_vision(game_state)
+    # game_state = get_snake_vision(board)
+    # print_snake_vision(game_state)
 
     if visual_mode and surface is not None:
-        draw_game(surface, board)
+    #     draw_game(surface, board)
         pygame.display.update()
 
     step_limit: int = 0
 
+    MOVE_MAP = {
+        pygame.K_w: Direction.UP,
+        pygame.K_s: Direction.DOWN,
+        pygame.K_a: Direction.LEFT,
+        pygame.K_d: Direction.RIGHT
+    }
+
     while not quit_game and not is_game_win_or_lost(board, step_limit):
-        run_game = not step_by_step
+        # run_game = not step_by_step
 
         if step_by_step:
-            if visual_mode:
-                pygame_event = pygame.event.wait()
-
-                if should_quit_game(pygame_event):
-                    quit_game = True
-                    continue
-
-                if is_step_validated(pygame_event):
-                    run_game = True
-            # else:
-            #     # TODO ça va ça?
-            #     step_validation = input(
-            #         "Press Enter to advance step (or type 'q' to quit)...")
-            #     if step_validation.strip().lower() == 'q':
-            #         quit_game = True
-            #         continue
-            #     run_game = True
+            pass
+        #     if visual_mode:
+        #         pygame_event = pygame.event.wait()
+        #
+        #         if should_quit_game(pygame_event):
+        #             quit_game = True
+        #             continue
+        #
+        #         if is_step_validated(pygame_event):
+        #             run_game = True
         else:
             for pygame_event in pygame.event.get():
+                if (pygame_event.type == pygame.KEYDOWN and pygame_event.key
+                        in MOVE_MAP):
+                    handle_movement(board, MOVE_MAP[pygame_event.key])
                 if should_quit_game(pygame_event):
                     quit_game = True
                     continue
@@ -85,32 +88,32 @@ def run_session(agent: Agent,
             if quit_game:
                 continue
 
-        if run_game:
-            snake_vision: ndarray = get_snake_vision(board)
-            game_state: str = (convert_game_state_to_bitmap(snake_vision)
-                               .tostring())
+        # if run_game:
+            # snake_vision: ndarray = get_snake_vision(board)
+            # game_state: str = (convert_game_state_to_bitmap(snake_vision)
+            #                    .tostring())
+            #
+            # action: Direction = agent.get_next_movement(game_state)
+            # eaten_apple: Apple | None = handle_movement(board, action)
+            #
+            # snake_vision: ndarray = get_snake_vision(board)
+            # new_game_state: str = (convert_game_state_to_bitmap(snake_vision)
+            #                        .tostring())
+            #
+            # is_dead = board.snake.is_dead()
+            # reward = calculate_reward(is_dead, eaten_apple)
+            #
+            # step_limit = process_step_limit(step_limit, reward)
+            #
+            # agent.learn(game_state, new_game_state, reward, action)
+            #
+            # print_snake_vision(snake_vision, action)
 
-            action: Direction = agent.get_next_movement(game_state)
-            eaten_apple: Apple | None = handle_movement(board, action)
-
-            snake_vision: ndarray = get_snake_vision(board)
-            new_game_state: str = (convert_game_state_to_bitmap(snake_vision)
-                                   .tostring())
-
-            is_dead = board.snake.is_dead()
-            reward = calculate_reward(is_dead, eaten_apple)
-
-            step_limit = process_step_limit(step_limit, reward)
-
-            agent.learn(game_state, new_game_state, reward, action)
-
-            print_snake_vision(snake_vision, action)
-
-        if visual_mode and surface is not None and clock is not None:
-            # if visual_mode and surface is not None:
-            draw_game(surface, board)
+        # if visual_mode and surface is not None and clock is not None:
+        #     # if visual_mode and surface is not None:
+        #     draw_game(surface, board)
             pygame.display.update()
             clock.tick(GL_FRAME_PER_SECOND)
 
     # Decreases epsilon so that the agent explores less and less overtime
-    agent.lower_epsilon()
+    # agent.lower_epsilon()

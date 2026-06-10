@@ -1,29 +1,20 @@
-from random import choice, randrange
-
 import pygame
 
 from pygame import Rect, Surface
+
 from constants import GL_SNAKE_EYE_COLOUR, GL_SNAKE_HEAD_COLOUR, \
     GL_SNAKE_PUPIL_COLOUR
 from sources.classes.apple import Apple
 from sources.enums.colour_enum import Colour
 from sources.enums.direction_enum import Direction
+from sources.classes.snake_segments import SnakeSegments
 
 
 class Snake:
     def __init__(self,
-                 segments: list[Rect],
-                 cell_length_px: int) -> None:
-        self.cell_length_px: int = cell_length_px
-        self.segments: list[Rect] = segments
-        self.deltas: dict[Direction, tuple[int, int]] = {
-            Direction.LEFT : (-self.cell_length_px, 0),
-            Direction.RIGHT: (self.cell_length_px, 0),
-            Direction.UP   : (0, -self.cell_length_px),
-            Direction.DOWN : (0, self.cell_length_px),
-        }
+                 segments_indices: SnakeSegments) -> None:
         self._is_dead: bool = False
-        self._head_surface: Surface = self._create_head_surface()
+        self._segments: SnakeSegments = segments_indices
 
     def sim_next_move(self, direction: Direction) -> Rect:
         """Simulates the movement of the snake and returns the Rect object
@@ -46,7 +37,7 @@ class Snake:
         the snake by one unit.
         """
         new_head: Rect = next_snake_head
-        self.segments.append(new_head)
+        self._segments.append(new_head)
 
         # Green apple prevents the snake from its default shrinkage
         if eaten_apple and eaten_apple.colour == Colour.GREEN:
@@ -58,28 +49,31 @@ class Snake:
 
         self._remove_tail()
 
-    def get_head(self) -> Rect:
-        return self.segments[-1]
+    # def get_head(self) -> Rect:
+    #     return self._segments[-1]
+    #
+    # def get_head_pos(self) -> tuple[int, int]:
+    #     head = self.get_head()
+    #     return head.x, head.y
 
-    def get_head_pos(self) -> tuple[int, int]:
-        head = self.get_head()
-        return head.x, head.y
+    # def get_tail(self) -> Rect:
+    #     return self._segments[0]
+    #
+    # def get_body(self) -> list[Rect]:
+    #     """Returns the body without head and without tail"""
+    #     return self._segments[1:-1]
+    #
+    # def get_neck(self) -> Rect:
+    #     return self._segments[-2]
 
-    def get_tail(self) -> Rect:
-        return self.segments[0]
-
-    def get_body(self) -> list[Rect]:
-        """Returns the body without head and without tail"""
-        return self.segments[1:-1]
-
-    def get_neck(self) -> Rect:
-        return self.segments[-2]
+    def get_segments(self) -> SnakeSegments:
+        return self._segments
 
     def _remove_tail(self) -> None:
-        self.segments.pop(0)
+        self._segments.pop(0)
 
         # If snake has no more segments, snake dies
-        if len(self.segments) == 0:
+        if len(self._segments) == 0:
             self.die()
 
     def is_dead(self) -> bool:

@@ -1,11 +1,18 @@
-import pygame
+import numpy as np
 
 from pygame import Rect, Surface
 from random import randrange, sample
-from constants import CL_GRID_COLOUR, GL_BOARD_SIZE_IN_CELL
+
+from constants import CL_GRID_COLOUR, GL_BOARD_SIZE_IN_CELL, \
+    GL_GAME_STATE_FREE_CELL, GL_GAME_STATE_GREEN_APPLE, \
+    GL_GAME_STATE_RED_APPLE, GL_GAME_STATE_SNAKE_BODY, \
+    GL_GAME_STATE_SNAKE_HEAD, GL_GAME_STATE_SNAKE_TAIL
 from sources.classes.apple import Apple
 from sources.classes.snake import Snake
+from sources.classes.snake_segments import SnakeSegments
 from sources.enums.colour_enum import Colour
+from sources.utils.create_grid_surface import create_grid_surface
+from sources.utils.fill_walls import fill_walls
 
 
 class Board:
@@ -13,91 +20,65 @@ class Board:
                  win_width: int,
                  win_height: int,
                  cell_length_px: int) -> None:
-        board_center_w: float = (win_width / 2)
-        board_center_h: float = (win_height / 2)
-        board_size_in_px: int = GL_BOARD_SIZE_IN_CELL * cell_length_px
-        board_half_size_in_cell: int = GL_BOARD_SIZE_IN_CELL // 2
-        board_half_size_in_px: int = (
-                board_half_size_in_cell * cell_length_px
-        )
-        l_border: int = int(board_center_w - board_half_size_in_px)
-        t_border: int = int(board_center_h - board_half_size_in_px)
+        # board_center_w: float = (win_width / 2)
+        # board_center_h: float = (win_height / 2)
+        # board_size_in_px: int = GL_BOARD_SIZE_IN_CELL * cell_length_px
+        # board_half_size_in_cell: int = GL_BOARD_SIZE_IN_CELL // 2
+        # board_half_size_in_px: int = (
+        #         board_half_size_in_cell * cell_length_px
+        # )
+        # l_border: int = int(board_center_w - board_half_size_in_px)
+        # t_border: int = int(board_center_h - board_half_size_in_px)
 
-        self.half_size_in_px: int = board_half_size_in_px
-        self.size_in_cell: int = GL_BOARD_SIZE_IN_CELL
-        self.total_amount_of_cells = self.size_in_cell * self.size_in_cell
-        self.cell_length_px: int = cell_length_px
-        self.rect: Rect = pygame.Rect(
-            l_border, t_border, board_size_in_px, board_size_in_px
-        )
+        # self.half_size_in_px: int = board_half_size_in_px
+        # self.size_in_cell: int = GL_BOARD_SIZE_IN_CELL
+        # self.total_amount_of_cells = self.size_in_cell * self.size_in_cell
+        # self.cell_length_px: int = cell_length_px
+        # self.rect: Rect = pygame.Rect(
+        #     l_border, t_border, board_size_in_px, board_size_in_px
+        # )
 
-        # Creates snake
-        self.snake: Snake = self._init_snake()
+        self._full_board = self._init_full_board()
 
-        self.apples: list[Apple] = []
-        if (apple := self.generate_apple(Colour.GREEN)) is not None:
-            self.apples.append(apple)
-        if (apple := self.generate_apple(Colour.GREEN)) is not None:
-            self.apples.append(apple)
-        if (apple := self.generate_apple(Colour.RED)) is not None:
-            self.apples.append(apple)
+        # Fills the board_array with walls
+        fill_walls(self._full_board)
 
-        self._grid: Surface = self._create_grid_surface()
+        # TODO tester les edge cases, crash a eu lieu
+        snake_indices = self._init_snake_pos()
+        self.snake: Snake = Snake(snake_indices)
+
+        self._fill_snake()
+
+        self._apples: list[Apple] | None = self._init_apples()
+
+        self._fill_apples()
+
+        # TODO ICI
+        self._grid: Surface = create_grid_surface()
         self._game_win: bool = False
 
-    def generate_apple(self, colour: Colour) -> Apple | None:
-        # Creates a set containing all cells on which an obstacle is, including
-        # snake segments and apples
-        occupied_cells: set[tuple[int, int]] = (
-                {(seg.x, seg.y) for seg in self.snake.segments} |
-                {(apple.rect.x, apple.rect.y) for apple in self.apples}
-        )
-        # Adds + 1 because the apple that is currently being generated has not
-        # been pushed in the apple list yet
-        if len(occupied_cells) + 1 == self.total_amount_of_cells:
+    # def generate_apple(self, colour: Colour) -> Apple | None:
+    def generate_apples(self, colours: list[Colour]) -> list[Apple] | None:
+        # Creates a ndarray[tuple] of all indices of the board that are free.
+        free_indices = np.argwhere(self._full_board == GL_GAME_STATE_FREE_CELL)
+
+        # TODO re-verifier ce cas
+        if len(free_indices) == 0:
             self.win()
             return None
 
-        while True:
-            col: int = randrange(GL_BOARD_SIZE_IN_CELL)
-            row: int = randrange(GL_BOARD_SIZE_IN_CELL)
+        free_indices = sample(free_indices.tolist(), len(colours))
 
-            x: int = (col * self.cell_length_px) + self.rect.left
-            y: int = (row * self.cell_length_px) + self.rect.top
-
-            # Only leaves the loop when a free cell has been found
-            if (occupied_cells is None or
-                    (x, y) not in occupied_cells):
-                # Add apple position to occupied cells
-                return Apple(
-                    Rect((x, y), (self.cell_length_px, self.cell_length_px)),
-                    colour
-                )
+        return [Apple(indices=indices, colour=colour) for indices, colour
+                in zip(free_indices, colours)]
 
     def handle_apple_eaten(self, apple: Apple) -> None:
         # Remove the eaten apple from the list of apples
         self.apples.remove(apple)
 
         # Creates a new apple of the same colour
-        if (apple := self.generate_apple(apple.colour)) is not None:
+        if (apple := self.generate_apples(apple.colour)) is not None:
             self.apples.append(apple)
-
-    def _create_grid_surface(self) -> Surface:
-        grid_length_px: int = self.size_in_cell * self.cell_length_px
-
-        grid: Surface = Surface(
-            (grid_length_px + 1, grid_length_px + 1), pygame.SRCALPHA)
-
-        for i in range(self.size_in_cell + 1):
-            pos = i * self.cell_length_px
-            # Vertical
-            pygame.draw.line(grid, CL_GRID_COLOUR, (pos, 0),
-                             (pos, grid_length_px))
-            # Horizontal
-            pygame.draw.line(grid, CL_GRID_COLOUR, (0, pos),
-                             (grid_length_px, pos))
-
-        return grid
 
     def get_grid(self) -> Surface:
         return self._grid
@@ -108,40 +89,85 @@ class Board:
     def win(self) -> None:
         self._game_win = True
 
-    def _init_snake(self) -> Snake:
+    def get_full_board(self) -> np.ndarray:
+        """Returns the whole board including the wall outline"""
+        return self._full_board
+
+    def _init_playable_area_view(self) -> np.ndarray:
+        """Returns a view area without the wall outline."""
+        return self._full_board[1:-1, 1:-1]
+
+    def _init_snake_pos(self) -> SnakeSegments:
         # Selects a random cell on the grid that will correspond to the
-        # snake's body
-        body_col: int = randrange(self.size_in_cell)
-        body_row: int = randrange(self.size_in_cell)
+        # snake's body.
+        full_board_rows, full_board_cols = self._full_board.shape
 
-        # Maps out 4 adjacent cells
+        # In full board, index '0' and 'full_board_rows' are walls.
+        # Thus, we start the range to 1 and stop it to full_board_rows - 1,
+        # stop value being excluded
+        body_row: int = randrange(1, full_board_rows - 1)
+        body_col: int = randrange(1, full_board_cols - 1)
+
+        # Maps out 4 adjacent cells.
+        # Some could be out of bounds but since the body's index in is
+        # bounds, there will always be at least 2 adjacent indices in bounds
+        # as well.
         adjacent_cells: list[tuple[int, int]] = [
-            (body_col + 1, body_row),  # Right
-            (body_col - 1, body_row),  # Left
-            (body_col, body_row + 1),  # Down
-            (body_col, body_row - 1)   # Up
+            (body_row - 1, body_col),  # Up
+            (body_row, body_col + 1),  # Right
+            (body_row + 1, body_col),  # Down
+            (body_row, body_col - 1)  # Left
         ]
 
-        # Filters out the out of bound cells
+        # Filters out the out of bound indices.
         valid_adjacent_cells: list[tuple[int, int]] = [
-            (c, r) for c, r in adjacent_cells
-            if 0 <= c < self.size_in_cell and 0 <= r < self.size_in_cell
+            (row, col) for row, col in adjacent_cells
+            if 1 <= row < full_board_rows - 1
+               and 1 <= col < full_board_cols - 1
         ]
 
-        tail_cell, head_cell = sample(valid_adjacent_cells, 2)
+        head_indices, tail_indices = sample(valid_adjacent_cells, 2)
+        body_indices = (body_row, body_col)
 
-        def to_rect(col: int, row: int) -> Rect:
-            return Rect(
-                self.rect.left + (col * self.cell_length_px),
-                self.rect.top + (row * self.cell_length_px),
-                self.cell_length_px,
-                self.cell_length_px
-            )
+        return SnakeSegments(head_indices=head_indices,
+                             body_indices=[body_indices],
+                             tail_indices=tail_indices)
 
-        segments: list[Rect] = [
-            to_rect(*tail_cell),
-            to_rect(body_col, body_row),
-            to_rect(*head_cell)
-        ]
+    def _fill_snake(self):
+        segments = self.snake.get_segments()
 
-        return Snake(segments, self.cell_length_px)
+        # Head.
+        head_row, head_col = segments.head_indices
+        self._full_board[head_row, head_col] = GL_GAME_STATE_SNAKE_HEAD
+
+        # Body.
+        for body_row, body_col in segments.body_indices:
+            self._full_board[body_row, body_col] = GL_GAME_STATE_SNAKE_BODY
+
+        # Tail.
+        tail_row, tail_col = segments.tail_indices
+        self._full_board[tail_row, tail_col] = GL_GAME_STATE_SNAKE_TAIL
+
+    def _init_apples(self) -> list[Apple] | None:
+        return self.generate_apples([Colour.GREEN, Colour.GREEN, Colour.RED])
+
+    def _fill_apples(self):
+        if self._apples is None:
+            return
+
+        for apple in self._apples:
+            row, col = apple.indices
+
+            if apple.colour == Colour.GREEN:
+                self._full_board[row][col] = GL_GAME_STATE_GREEN_APPLE
+            else:
+                self._full_board[row][col] = GL_GAME_STATE_RED_APPLE
+
+    def _init_full_board(self) -> np.ndarray:
+        # Adds 2 to have walls on each edge
+        board_size_in_cell_with_walls = GL_BOARD_SIZE_IN_CELL + 2
+        board_shape: tuple[int, int] = (
+            board_size_in_cell_with_walls, board_size_in_cell_with_walls
+        )
+
+        return np.full(board_shape, GL_GAME_STATE_FREE_CELL, dtype='<U1')

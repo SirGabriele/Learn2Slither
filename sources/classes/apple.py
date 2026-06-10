@@ -1,8 +1,9 @@
-from pygame import Rect
+from dataclasses import dataclass
+
 from sources.enums.colour_enum import Colour
 
 
+@dataclass
 class Apple:
-    def __init__(self, rect: Rect, colour: Colour) -> None:
-        self.rect: Rect = rect
-        self.colour: Colour = colour
+    indices: tuple[int, int]
+    colour: Colour
