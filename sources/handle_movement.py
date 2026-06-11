@@ -8,7 +8,7 @@ from sources.utils.get_eaten_apple import get_eaten_apple
 
 
 def handle_movement(board: Board, direction: Direction) -> Apple | None:
-    snake = board.snake
+    snake = board._snake
     next_snake_head: Rect = snake.sim_next_move(direction)
 
     if is_snake_out_of_bound(board.rect, next_snake_head) or \

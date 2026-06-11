@@ -7,7 +7,6 @@ from sources.classes.board import Board
 from sources.enums.colour_enum import Colour
 from sources.utils.fill_walls import fill_walls
 from sources.utils.has_body import has_body
-from sources.utils.has_tail import has_tail
 
 
 def get_board_index(px_array: np.ndarray,
@@ -20,20 +19,20 @@ def get_snake_layer(array: np.ndarray,
                     board: Board,
                     left_offset: int,
                     top_offset: int):
-    if len(board.snake._segments) == 0:
+    if len(board._snake._segments) == 0:
         print("if len segment = 0 get_snake_layer")
         return
 
-    lefts = np.array([s.left for s in board.snake._segments])
-    tops = np.array([s.top for s in board.snake._segments])
+    lefts = np.array([s.left for s in board._snake._segments])
+    tops = np.array([s.top for s in board._snake._segments])
 
     col_idxs = get_board_index(lefts, left_offset, board.cell_length_px)
     row_idxs = get_board_index(tops, top_offset, board.cell_length_px)
 
     array[row_idxs[-1] + 1, col_idxs[-1] + 1] = GL_GAME_STATE_SNAKE_HEAD
-    if has_body(board.snake):
+    if has_body(board._snake):
         array[row_idxs[1:-1] + 1, col_idxs[1:-1] + 1] = GL_GAME_STATE_SNAKE_BODY
-    if has_tail(board.snake):
+    if has_tail(board._snake):
         array[row_idxs[0] + 1, col_idxs[0] + 1] = GL_GAME_STATE_SNAKE_TAIL
 
 

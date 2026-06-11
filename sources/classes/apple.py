@@ -5,5 +5,5 @@ from sources.enums.colour_enum import Colour
 
 @dataclass
 class Apple:
-    indices: tuple[int, int]
+    board_coord: tuple[int, int]
     colour: Colour
