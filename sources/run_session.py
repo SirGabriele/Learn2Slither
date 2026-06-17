@@ -1,47 +1,35 @@
 import pygame
 
-from numpy import ndarray
-from pygame import Surface
-from pygame.time import Clock
-
-from constants import GL_BOARD_SIZE_IN_CELL, GL_FRAME_PER_SECOND, \
-    GL_PROGRAM_NAME
-
 from sources.agent.agent import Agent
-from sources.agent.calculate_reward import calculate_reward
 from sources.classes.board import Board
 from sources.classes.renderer import Renderer
-from sources.classes.apple import Apple
-from sources.utils.convert_game_state_to_bitmap import \
-    convert_game_state_to_bitmap
 from sources.enums.direction_enum import Direction
 from sources.handle_movement import handle_movement
 from sources.get_snake_vision import get_snake_vision
 from sources.utils.is_game_win_or_lost import is_game_win_or_lost
-from sources.utils.is_step_validated import is_step_validated
 from sources.utils.print_snake_vision import print_snake_vision
-from sources.utils.process_step_limit import process_step_limit
 from sources.utils.should_quit_game import should_quit_game
 
 
 def run_session(agent: Agent,
                 renderer: Renderer | None,
                 step_by_step: bool):
-    # Initialises Board
+    # Initialises Board.
     board: Board = Board()
 
-    # Boolean that represents if the game must be quited or not
+    # Boolean that represents if the game must be quited or not.
     quit_game: bool = False
 
-    # Prints the initial snake vision
-    # game_state = get_snake_vision(board)
-    # print_snake_vision(game_state)
+    # Prints the initial snake vision.
+    game_state = get_snake_vision(board)
+    print_snake_vision(game_state)
 
     if renderer is not None:
-        renderer.update(snake=board.get_snake(), apples=board.get_apples())
+        renderer.update(snake=board.snake, apples=board.apples)
 
     step_limit: int = 0
 
+    # TODO delete
     MOVE_MAP = {
         pygame.K_w: Direction.UP,
         pygame.K_s: Direction.DOWN,
@@ -65,12 +53,16 @@ def run_session(agent: Agent,
         #             run_game = True
         else:
             for pygame_event in pygame.event.get():
-                if (pygame_event.type == pygame.KEYDOWN and pygame_event.key
-                        in MOVE_MAP):
-                    handle_movement(board, MOVE_MAP[pygame_event.key])
                 if should_quit_game(pygame_event):
                     quit_game = True
                     continue
+                if (pygame_event.type == pygame.KEYDOWN and pygame_event.key
+                        in MOVE_MAP):
+                    handle_movement(board, MOVE_MAP[pygame_event.key])
+                    board.snake.digest_apple()
+
+                    game_state = get_snake_vision(board)
+                    print_snake_vision(game_state, MOVE_MAP[pygame_event.key])
 
             if quit_game:
                 continue
@@ -96,9 +88,9 @@ def run_session(agent: Agent,
         #
         # print_snake_vision(snake_vision, action)
 
-        if renderer is not None:
-            renderer.update(snake=board.get_snake(),
-                            apples=board.get_apples(),
+        if renderer is not None and board.snake.is_dead() is False:
+            renderer.update(snake=board.snake,
+                            apples=board.apples,
                             tick=True)
 
     # Decreases epsilon so that the agent explores less and less overtime

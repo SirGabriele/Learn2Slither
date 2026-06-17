@@ -1,9 +1,3 @@
-import pygame
-
-from pygame import Rect, Surface
-
-from constants import GL_SNAKE_EYE_COLOUR, GL_SNAKE_HEAD_COLOUR, \
-    GL_SNAKE_PUPIL_COLOUR
 from sources.classes.apple import Apple
 from sources.enums.colour_enum import Colour
 from sources.enums.direction_enum import Direction
@@ -15,66 +9,66 @@ class Snake:
                  segments_indices: SnakeSegments) -> None:
         self._is_dead: bool = False
         self._segments: SnakeSegments = segments_indices
+        self._eaten_apple: Apple | None = None
+        self._deltas: dict[Direction, tuple[int, int]] = {
+            Direction.LEFT: (0, -1),
+            Direction.RIGHT: (0, 1),
+            Direction.UP: (-1, 0),
+            Direction.DOWN: (1, 0),
+        }
 
-    # def sim_next_move(self, direction: Direction) -> Rect:
-    #     """Simulates the movement of the snake and returns the Rect object
-    #     the head of the snake would use"""
-    #     dx, dy = self.deltas[direction]
-    #     return self.get_head().move(dx, dy)
+    def sim_next_move(self, direction: Direction) -> tuple[int, int]:
+        """Simulates the movement of the snake and returns indices it would
+        have."""
+        curr_row, curr_col = self._segments.head
+        next_row, next_col = self._deltas[direction]
+        return curr_row + next_row, curr_col + next_col
 
-    # def move(self, next_snake_head: Rect, eaten_apple: Apple | None) -> None:
-    #     """Each turn the snake obtains a new segment at its new head position
-    #     and loses an element at its tail position, visually simulating its
-    #     progress. Segment wise, this behaviour does +1 -1, which does not
-    #     change the total length of the snake.
-    #
-    #     When a green apple is eaten, prevents the snake from its default
-    #     tail loss. Segment wise, only does +1, which increases the total length
-    #     of the snake by one unit.
-    #
-    #     When a red apple is eaten, applies a tail loss on top of the default
-    #     one. Segment wise, does +1 -1 -1, which decreases the total length of
-    #     the snake by one unit.
-    #     """
-    #     new_head: Rect = next_snake_head
-    #     self._segments.append(new_head)
-    #
-    #     # Green apple prevents the snake from its default shrinkage
-    #     if eaten_apple and eaten_apple.colour == Colour.GREEN:
-    #         return
-    #
-    #     # Red apple leads to one extra tail loss
-    #     if eaten_apple and eaten_apple.colour == Colour.RED:
-    #         self._remove_tail()
-    #
-    #     self._remove_tail()
+    def move(self, next_snake_head_coord: tuple[int, int]) -> None:
+        """Each turn the snake obtains a new segment at its previous head
+        position and loses an element at its tail position, visually
+        simulating its progress. Segment wise, this behaviour does +1 -1, which
+        does not change the total length of the snake.
 
-    # def get_head(self) -> Rect:
-    #     return self._segments[-1]
-    #
-    # def get_head_pos(self) -> tuple[int, int]:
-    #     head = self.get_head()
-    #     return head.x, head.y
+        When a green apple is eaten, prevents the snake from its default
+        tail loss. Segment wise, only does +1, which increases the total length
+        of the snake by one unit.
 
-    # def get_tail(self) -> Rect:
-    #     return self._segments[0]
-    #
-    # def get_body(self) -> list[Rect]:
-    #     """Returns the body without head and without tail"""
-    #     return self._segments[1:-1]
-    #
-    # def get_neck(self) -> Rect:
-    #     return self._segments[-2]
+        When a red apple is eaten, applies a tail loss on top of the default
+        one. Segment wise, does +1 -1 -1, which decreases the total length of
+        the snake by one unit.
+        """
+        body = self._segments.body_board_coords
 
-    def get_segments(self) -> SnakeSegments:
+        body.append(next_snake_head_coord)
+
+        if (apple := self._eaten_apple) is not None:
+            if apple.colour == Colour.GREEN:
+                return
+            else:
+                body.pop(0)
+
+        if body:
+            body.pop(0)
+
+        if not body:
+            self.die()
+
+    #########################################################
+    # ################## PROPERTIES #########################
+    #########################################################
+
+    @property
+    def segments(self) -> SnakeSegments:
         return self._segments
 
-    # def _remove_tail(self) -> None:
-    #     self._segments.pop(0)
-    #
-    #     # If snake has no more segments, snake dies
-    #     if len(self._segments) == 0:
-    #         self.die()
+    @property
+    def eaten_apple(self) -> Apple | None:
+        return self._eaten_apple
+
+    #########################################################
+    # ################## PUBLIC METHODS #####################
+    #########################################################
 
     def is_dead(self) -> bool:
         return self._is_dead
@@ -82,36 +76,17 @@ class Snake:
     def die(self) -> None:
         self._is_dead = True
 
-    # def get_head_surface(self) -> Surface:
-    #     return self._head_surface
+    def eat_apple(self,
+                  next_snake_head_coord: tuple[int, int],
+                  apples: list[Apple]) -> None:
+        for apple in apples:
+            if next_snake_head_coord == apple.board_coord:
+                self.set_eaten_apple(apple)
+                break
 
-    # def _create_head_surface(self) -> Surface:
-    #     # Creates the surface and the rectangle to draw on
-    #     surface = Surface((self.cell_length_px, self.cell_length_px))
-    #     rect = (0, 0, self.cell_length_px, self.cell_length_px)
-    #
-    #     # Draws the rectangle (background) within the surface
-    #     pygame.draw.rect(surface, GL_SNAKE_HEAD_COLOUR, rect)
-    #
-    #     # Uses the length of the cell to define circles position and sizes
-    #     eye_radius = self.cell_length_px // 4
-    #     eye_offset = self.cell_length_px // 4
-    #     pupil_radius = eye_radius // 2
-    #
-    #     # Draws left eye within the surface
-    #     pygame.draw.circle(surface, GL_SNAKE_EYE_COLOUR,
-    #                        (eye_offset, eye_offset),
-    #                        eye_radius)
-    #     pygame.draw.circle(surface, GL_SNAKE_PUPIL_COLOUR,
-    #                        (eye_offset, eye_offset),
-    #                        pupil_radius)
-    #
-    #     # Draws right eye within the surface
-    #     pygame.draw.circle(surface, GL_SNAKE_EYE_COLOUR,
-    #                        (self.cell_length_px - eye_offset, eye_offset),
-    #                        eye_radius)
-    #     pygame.draw.circle(surface, GL_SNAKE_PUPIL_COLOUR,
-    #                        (self.cell_length_px - eye_offset, eye_offset),
-    #                        pupil_radius)
-    #
-    #     return surface
+    def set_eaten_apple(self, apple: Apple | None) -> None:
+        self._eaten_apple = apple
+
+    def digest_apple(self) -> None:
+        if self._eaten_apple is not None:
+            self.set_eaten_apple(None)

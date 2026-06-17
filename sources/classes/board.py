@@ -2,7 +2,8 @@ import numpy as np
 
 from random import randrange, sample
 
-from constants import GL_GAME_STATE_FREE_CELL, GL_GAME_STATE_GREEN_APPLE, \
+from constants import GL_BOARD_SIZE_IN_CELL, GL_GAME_STATE_FREE_CELL, \
+    GL_GAME_STATE_GREEN_APPLE, \
     GL_GAME_STATE_RED_APPLE, GL_GAME_STATE_SNAKE_BODY, \
     GL_GAME_STATE_SNAKE_HEAD, GL_GAME_STATE_SNAKE_TAIL
 from sources.classes.apple import Apple
@@ -19,7 +20,7 @@ class Board:
         # Contains the wall outline.
         self._full_board: np.ndarray = init_full_board()
 
-        # Only contains the playable area.
+        # A view of full board that only contains the playable area.
         self._playable_area: np.ndarray = self._init_playable_area_view()
 
         # Fills the board_array with walls.
@@ -27,54 +28,46 @@ class Board:
 
         snake_indices = self._init_snake_pos()
         self._snake: Snake = Snake(snake_indices)
+
         self._fill_snake()
 
-        self._apples: list[Apple] | None = self._init_apples()
-        if self._apples is None:
+        self._apples: list[Apple] = self._init_apples()
+        if len(self._apples) == 0:
             raise InitialisationException("self._apples")
-        self.fill_apples(self._apples)
+
+        self._fill_apples(self._apples)
 
         self._game_win: bool = False
+        self._total_amount_cells = (GL_BOARD_SIZE_IN_CELL *
+                                    GL_BOARD_SIZE_IN_CELL)
 
-    def generate_apples(self, colours: list[Colour]) -> list[Apple] | None:
-        # Creates a ndarray[tuple] of all indices of the board that are free.
-        free_indices = np.argwhere(
-            self._playable_area == GL_GAME_STATE_FREE_CELL)
+    #########################################################
+    # ################## PROPERTIES #########################
+    #########################################################
 
-        # TODO re-verifier ce cas
-        if len(free_indices) == 0:
-            self.win()
-            return None
-
-        free_indices = sample(free_indices.tolist(), len(colours))
-
-        return [Apple(board_coord=indices, colour=colour) for indices, colour
-                in zip(free_indices, colours)]
-
-    # def handle_apple_eaten(self, apple: Apple) -> None:
-    #     # Remove the eaten apple from the list of apples
-    #     self.apples.remove(apple)
-    #
-    #     # Creates a new apple of the same colour
-    #     if (apple := self.generate_apples(apple.colour)) is not None:
-    #         self.apples.append(apple)
-
-    def is_win(self) -> bool:
-        return self._game_win
-
-    def win(self) -> None:
-        self._game_win = True
-
-    def get_full_board(self) -> np.ndarray:
+    @property
+    def full_board(self) -> np.ndarray:
         return self._full_board
 
-    def get_snake(self) -> Snake:
+    @property
+    def playable_area(self) -> np.ndarray:
+        return self._playable_area
+
+    @property
+    def snake(self) -> Snake:
         return self._snake
 
-    def get_apples(self) -> list[Apple] | None:
+    @property
+    def apples(self) -> list[Apple]:
         return self._apples
 
+    #########################################################
+    # ################## PRIVATE METHODS ####################
+    #########################################################
+
     def _init_playable_area_view(self) -> np.ndarray:
+        """Returns a view of full board that does not contain the wall
+        outline."""
         return self._full_board[1:-1, 1:-1]
 
     def _init_snake_pos(self) -> SnakeSegments:
@@ -106,32 +99,38 @@ class Board:
         head_indices, tail_indices = sample(valid_adjacent_cells, 2)
         body_indices = (body_row, body_col)
 
-        return SnakeSegments(head_board_coord=head_indices,
-                             body_board_coords=[body_indices],
-                             tail_board_coord=tail_indices)
+        return SnakeSegments(
+            body_board_coords=[tail_indices, body_indices, head_indices])
 
-    def _fill_snake(self):
-        segments = self._snake.get_segments()
+    def _init_apples(self) -> list[Apple]:
+        return self.generate_apples(
+            [Colour.GREEN, Colour.GREEN, Colour.RED],
+            is_first_generation=True
+        )
+
+    def _fill_snake(self) -> None:
+        """Updates the content of the playable area with the coordinates
+        of all snake segments currently on the board."""
+        segments = self._snake.segments
 
         # Head.
-        head_row, head_col = segments.head_board_coord
+        head_row, head_col = segments.head
         self._playable_area[head_row, head_col] = GL_GAME_STATE_SNAKE_HEAD
 
         # Body.
-        if self._snake.get_segments().body_board_coords is not None:
-            for body_row, body_col in segments.body_board_coords:
+        if len(self._snake.segments.middle) != 0:
+            for body_row, body_col in segments.middle:
                 self._playable_area[
                     body_row, body_col] = GL_GAME_STATE_SNAKE_BODY
 
         # Tail.
-        if self._snake.get_segments().tail_board_coord is not None:
-            tail_row, tail_col = segments.tail_board_coord
+        if self._snake.segments.tail is not None:
+            tail_row, tail_col = segments.tail
             self._playable_area[tail_row, tail_col] = GL_GAME_STATE_SNAKE_TAIL
 
-    def _init_apples(self) -> list[Apple] | None:
-        return self.generate_apples([Colour.GREEN, Colour.GREEN, Colour.RED])
-
-    def fill_apples(self, apples: list[Apple]):
+    def _fill_apples(self, apples: list[Apple]) -> None:
+        """Updates the content of the playable area with the coordinates
+        of all apples currently on the board."""
         if apples is None:
             return
 
@@ -142,3 +141,54 @@ class Board:
                 self._playable_area[row][col] = GL_GAME_STATE_GREEN_APPLE
             else:
                 self._playable_area[row][col] = GL_GAME_STATE_RED_APPLE
+
+    #########################################################
+    # ################## PUBLIC METHODS #####################
+    #########################################################
+
+    def generate_apples(self, colours: list[Colour],
+                        is_first_generation: bool = False) -> list[Apple]:
+        # Creates a ndarray[tuple] of all indices of the board that are free.
+        free_indices = np.argwhere(
+            self._playable_area == GL_GAME_STATE_FREE_CELL)
+
+        if len(free_indices) == 0:
+            # Only verifies winning condition once the initial generation
+            # has been performed.
+            if not is_first_generation:
+                if not np.any(self._playable_area ==
+                              GL_GAME_STATE_GREEN_APPLE):
+                    self.win()
+            return []
+
+        free_indices = [
+            (row, col)
+            for row, col in sample(free_indices.tolist(), len(colours))
+        ]
+
+        return [Apple(board_coord=indices, colour=colour) for indices, colour
+                in zip(free_indices, colours)]
+
+    def handle_apple_eaten(self, apple: Apple) -> None:
+        # Removes the eaten apple from the list of apples.
+        self._apples.remove(apple)
+
+        self.update_playable_area()
+
+        # Creates a new apple of the same colour.
+        apples = self.generate_apples([apple.colour])
+        if len(apples) != 0:
+            self._apples.append(apples[0])
+
+    def is_win(self) -> bool:
+        return self._game_win
+
+    def win(self) -> None:
+        self._game_win = True
+
+    def update_playable_area(self) -> None:
+        """Updates the content of the playable area with the coordinates
+        of all snake segments and apples currently on the board."""
+        self._playable_area[:] = GL_GAME_STATE_FREE_CELL
+        self._fill_snake()
+        self._fill_apples(self._apples)

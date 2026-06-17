@@ -3,4 +3,14 @@ from sources.classes.board import Board
 
 
 def is_game_win_or_lost(board: Board, step_limit: int) -> bool:
-    return board.is_win() or board._snake.is_dead() or step_limit >= GL_MAX_STEP
+    result: list[tuple[bool, str]] = [
+        (board.is_win(), "You won!"),
+        (board.snake.is_dead(), "You died!"),
+        (step_limit >= GL_MAX_STEP, "Going in circles!"),
+    ]
+
+    for condition, msg in result:
+        if condition:
+            print(msg)
+            return True
+    return False
