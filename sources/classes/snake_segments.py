@@ -11,10 +11,6 @@ class SnakeSegments:
     def head(self) -> tuple[int, int]:
         return self.body_board_coords[-1]
 
-    @head.setter
-    def head(self, value: tuple[int, int]) -> None:
-        self.body_board_coords[-1] = value
-
     @property
     def tail(self) -> tuple[int, int] | None:
         return (self.body_board_coords[0]

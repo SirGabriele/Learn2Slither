@@ -1,13 +1,12 @@
 import numpy as np
 
-from constants import GL_PRINT_TERMINAL
 from sources.enums.direction_enum import Direction
 
 
-def print_snake_vision(board_array: np.ndarray,
+def print_snake_vision(cross_view: np.ndarray,
+                       is_learning_mode: bool,
                        action: Direction | None = None) -> None:
-    # TODO delete
-    if GL_PRINT_TERMINAL is False:
+    if is_learning_mode:
         return
 
     if action is not None:
@@ -16,7 +15,7 @@ def print_snake_vision(board_array: np.ndarray,
 
     # Concatenates all rows and prints them to avoid the native ndarray print
     # format [[' ', ...]]
-    for row in board_array:
+    for row in cross_view:
         print(" ".join(row))
 
     print()
