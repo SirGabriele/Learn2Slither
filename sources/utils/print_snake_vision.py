@@ -1,12 +1,12 @@
 import numpy as np
 
+from constants import GL_PRINT_TERMINAL
 from sources.enums.direction_enum import Direction
 
 
 def print_snake_vision(cross_view: np.ndarray,
-                       is_learning_mode: bool,
                        action: Direction | None = None) -> None:
-    if is_learning_mode:
+    if not GL_PRINT_TERMINAL:
         return
 
     if action is not None:

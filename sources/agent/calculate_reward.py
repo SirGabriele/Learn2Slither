@@ -1,13 +1,11 @@
 from constants import GL_REWARD_DEATH, GL_REWARD_EMPTY_SPACE, \
-    GL_REWARD_GREEN_APPLE, \
-    GL_REWARD_RED_APPLE
+    GL_REWARD_GREEN_APPLE, GL_REWARD_RED_APPLE
 
 from sources.classes.apple import Apple
 from sources.enums.colour_enum import Colour
 
 
-def calculate_reward(is_dead: bool,
-                     eaten_apple: Apple | None) -> int:
+def calculate_reward(is_dead: bool, eaten_apple: Apple | None) -> int:
     if is_dead:
         return GL_REWARD_DEATH
 

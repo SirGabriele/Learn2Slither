@@ -89,7 +89,7 @@ def _load_file_valid(path_str: str) -> Path:
 
 
 def _add_arg_load(parser: ArgumentParser) -> None:
-    load_help_desc: str = ("file from which the model will be initialised ("
+    load_help_desc: str = ("file from which the model will is initialised ("
                            "Path)")
 
     parser.add_argument("--load", type=_load_file_valid,
@@ -99,7 +99,8 @@ def _add_arg_load(parser: ArgumentParser) -> None:
 
 def _add_arg_save(parser: ArgumentParser) -> None:
     save_help_desc: str = ("file in which the resulting model will be "
-                           "saved (Path). Requires '-l on' / '--learning on'")
+                           "saved (Path). Requires learning mode to be "
+                           "enabled")
 
     parser.add_argument("--save", type=_save_file_valid,
                         default=None, metavar="/path/to/save/file",
@@ -107,39 +108,41 @@ def _add_arg_save(parser: ArgumentParser) -> None:
 
 
 def _add_arg_debug(parser: ArgumentParser) -> None:
-    help_desc: str = ("debug mode allows the user the play the game. Requires "
-                      "'-v on' / '--visual on'")
+    help_desc: str = ("allows the user the play the game. Requires "
+                      "visual mode to be enabled. Not compatible with any "
+                      "other mode")
 
     parser.add_argument("-d", "--debug",
                         action="store_true", default=False, help=help_desc)
 
 
 def _add_arg_step_by_step(parser: ArgumentParser) -> None:
-    help_desc: str = ("if visual mode is on, will wait for a user input "
-                      "between each step. Requires '-v off' / '--visual off'")
+    help_desc: str = ("waits for a user input between each step. Requires "
+                      "visual mode to be enabled. Not compatible with debug "
+                      "mode")
 
     parser.add_argument("-sbs", "--step-by-step",
                         action="store_true", default=False, help=help_desc)
 
 
 def _add_arg_learning(parser: ArgumentParser) -> None:
-    help_desc: str = ("if the model should learn from each session. Requires "
-                      "'--save' to be specified")
+    help_desc: str = ("when activated, the model should learn from each "
+                      "session. A saving file must be provided")
 
-    parser.add_argument("-l", "--learning", choices=["on", "off"],
-                        default="off", help=help_desc)
+    parser.add_argument("-l", "--learning",
+                        action="store_true", default=False, help=help_desc)
 
 
 def _add_arg_visual(parser: ArgumentParser) -> None:
-    help_desc: str = ("visual mode on means a window will render the game "
-                      "state. Not compatible with '-sbs' / '--step-by-step'")
+    help_desc: str = ("displays the game in a window. Not compatible with "
+                      "step by step mode")
 
-    parser.add_argument("-v", "--visual", choices=["on", "off"],
-                        required=True, help=help_desc)
+    parser.add_argument("-v", "--visual",
+                        action="store_true", default=False, help=help_desc)
 
 
 def _add_arg_session(parser: ArgumentParser) -> None:
-    help_desc: str = "number of sessions to run (integer)"
+    help_desc: str = "number of sessions to run (integer). Required parameter"
 
     parser.add_argument("-s", "--session", type=int,
                         metavar="N", required=True,

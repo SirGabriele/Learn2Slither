@@ -51,6 +51,14 @@ class Renderer:
     # ################## PRIVATE METHODS ####################
     #########################################################
 
+    @property
+    def visual_mode(self) -> bool:
+        return self._visual_mode
+
+    #########################################################
+    # ################## PRIVATE METHODS ####################
+    #########################################################
+
     def _tick(self) -> None:
         self._clock.tick(GL_FRAME_PER_SECOND)
 

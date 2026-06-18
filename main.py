@@ -15,24 +15,26 @@ from sources.utils.get_window_dimensions import get_window_dimensions
 
 
 def _handle_parser_errors(parser: ArgumentParser, args: Namespace) -> None:
-    if args.learning == "on" and args.save is None:
-        parser.error(
-            "Arguments conflict: '--save' is required when learning is "
-            "'on'.")
+    is_save_mode = args.save is not None
 
-    if args.save is not None and args.learning == "off":
+    if args.learning != is_save_mode:
         parser.error(
-            "Arguments conflict: Can not use '--save' when learning is 'off'.")
+            "Arguments conflict: Learning mode and saving file must be both "
+            "provided or both absent.")
 
-    if args.visual == "off" and args.step_by_step:
+    if args.step_by_step and not args.visual:
         parser.error(
-            "Arguments conflict: Can not use 'step by step mode' when visual "
+            "Arguments conflict: Can not use step by step mode when visual "
             "mode is 'off'.")
 
-    if args.debug and args.visual == "off":
-        parser.error(
-            "Arguments conflict: Can not use 'debug mode' when visual "
-            "mode is 'off'.")
+    if args.debug:
+        if (not args.visual
+                or args.step_by_step
+                or args.learning
+                or args.load is not None
+                or args.save is not None):
+            parser.error("Arguments conflict: In debug mode, only visual "
+                         "mode and sessions must be provided.")
 
 
 def main():
@@ -42,14 +44,14 @@ def main():
     _handle_parser_errors(parser, args)
 
     sessions: int = args.session
-    visual_mode: bool = args.visual == "on"
+    visual_mode: bool = args.visual
     save_file: Path | None = args.save
     load_file: Path | None = args.load
-    learning_mode: bool = args.learning == "on"
+    learning_mode: bool = args.learning
     step_by_step: bool = args.step_by_step
     debug_mode: bool = args.debug
 
-    agent: Agent = Agent(save_file, load_file, learning_mode)
+    agent: Agent = Agent(sessions, save_file, load_file, learning_mode)
 
     # Initialises pygame.
     pygame.init()
@@ -75,7 +77,6 @@ def main():
                                        step_by_step=step_by_step,
                                        debug_mode=debug_mode)
             snake_lengths.append(snake_length)
-            print(f"Session {session + 1} ended. Snake length: {snake_length}")
     finally:
         pygame.quit()
 

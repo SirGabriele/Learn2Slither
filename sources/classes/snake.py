@@ -11,10 +11,10 @@ class Snake:
         self._segments: SnakeSegments = segments_indices
         self._eaten_apple: Apple | None = None
         self._deltas: dict[Direction, tuple[int, int]] = {
-            Direction.LEFT: (0, -1),
-            Direction.RIGHT: (0, 1),
             Direction.UP: (-1, 0),
+            Direction.RIGHT: (0, 1),
             Direction.DOWN: (1, 0),
+            Direction.LEFT: (0, -1)
         }
 
     def sim_next_move(self, direction: Direction) -> tuple[int, int]:
