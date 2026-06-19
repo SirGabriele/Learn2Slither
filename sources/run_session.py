@@ -125,7 +125,9 @@ def run_session(agent: Agent,
 
             step_limit = process_step_limit(step_limit, reward)
 
-            agent.learn(game_state, new_game_state, reward, action, is_dead)
+            if agent.learning_mode:
+                agent.learn(game_state, new_game_state,
+                            reward, action, is_dead)
 
             if not is_dead:
                 print_snake_vision(cross_view=snake_vision,

@@ -99,8 +99,7 @@ def _add_arg_load(parser: ArgumentParser) -> None:
 
 def _add_arg_save(parser: ArgumentParser) -> None:
     save_help_desc: str = ("file in which the resulting model will be "
-                           "saved (Path). Requires learning mode to be "
-                           "enabled")
+                           "saved (Path)")
 
     parser.add_argument("--save", type=_save_file_valid,
                         default=None, metavar="/path/to/save/file",
@@ -126,8 +125,8 @@ def _add_arg_step_by_step(parser: ArgumentParser) -> None:
 
 
 def _add_arg_learning(parser: ArgumentParser) -> None:
-    help_desc: str = ("when activated, the model should learn from each "
-                      "session. A saving file must be provided")
+    help_desc: str = ("when activated, the model will learn from each "
+                      "session")
 
     parser.add_argument("-l", "--learning",
                         action="store_true", default=False, help=help_desc)

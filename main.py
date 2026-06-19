@@ -15,13 +15,6 @@ from sources.utils.get_window_dimensions import get_window_dimensions
 
 
 def _handle_parser_errors(parser: ArgumentParser, args: Namespace) -> None:
-    is_save_mode = args.save is not None
-
-    if args.learning != is_save_mode:
-        parser.error(
-            "Arguments conflict: Learning mode and saving file must be both "
-            "provided or both absent.")
-
     if args.step_by_step and not args.visual:
         parser.error(
             "Arguments conflict: Can not use step by step mode when visual "
